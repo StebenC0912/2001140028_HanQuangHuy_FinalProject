@@ -1,10 +1,9 @@
-import React, { useContext, useRef, useState, useMemo } from "react";
+import React, { useContext, useRef, useState, useMemo, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { NoteContext } from "../data/store/NoteContext";
 import { formatDistanceToNow, format } from "date-fns";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import BottomSheet from "@gorhom/bottom-sheet";
-
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 const EditNote = ({ navigation, route }) => {
   const context = useContext(NoteContext);
   const { notes, labels } = context;
@@ -13,10 +12,8 @@ const EditNote = ({ navigation, route }) => {
   const contentRef = useRef(null);
   const [isBookmarked, setIsBookmarked] = useState(data.isBookmarked);
   // bottom sheet
-  const bottomSheetRef = useRef < BottomSheet > null;
-  const snapPoints = useMemo(() => ["50%"], []);
-
-
+  const sheetRef = useRef(null);
+  const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
 
   const getLabelName = (id) => {
     const label = labels.find((label) => label.id === id);
@@ -47,6 +44,17 @@ const EditNote = ({ navigation, route }) => {
       isBookmarked: !isBookmarked,
     });
   };
+
+  const renderBackdrop = useCallback(
+		(props) => (
+			<BottomSheetBackdrop
+				{...props}
+				disappearsOnIndex={1}
+				appearsOnIndex={2}
+			/>
+		),
+		[]
+	);
   return (
     <View
       style={{
@@ -120,7 +128,7 @@ const EditNote = ({ navigation, route }) => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => sheetRef.current?.expand()}>
           <Ionicons
             name="ellipsis-vertical-outline"
             size={25}
@@ -128,6 +136,29 @@ const EditNote = ({ navigation, route }) => {
           />
         </TouchableOpacity>
       </View>
+      <BottomSheet
+        ref={sheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        borderRadius={10}
+        backdropComponent={renderBackdrop}
+        onChange={(index) => console.log("snapped to index:", index)}
+        enablePanDownToClose={true}
+        backgroundStyle={{ backgroundColor: "transparent" }}
+        enableDismissOnClose={false}
+        style={{ borderRadius: 10, borderWidth: 1, borderColor: "gray" }}
+      >
+        <View style={{ backgroundColor: "white", height: "100%", padding: 10 }}>
+          <TouchableOpacity
+            onPress={() => {
+              context.deleteNote(data.id);
+              navigation.goBack();
+            }}
+          >
+            <Text>Delete</Text>
+          </TouchableOpacity>
+        </View>
+      </BottomSheet>
     </View>
   );
 };

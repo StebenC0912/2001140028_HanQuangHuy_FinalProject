@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import NewNoteScreen from "../screens/NewNoteScreen";
 import EditNote from "../screens/EditNoteScreen";
+
 const Stack = createNativeStackNavigator();
 function CreateStack() {
   return (
