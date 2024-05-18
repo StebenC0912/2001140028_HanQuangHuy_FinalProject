@@ -6,6 +6,7 @@ import HomeScreen from "../screens/HomeScreen";
 import NewNoteScreen from "../screens/NewNoteScreen";
 import EditNote from "../screens/EditNoteScreen";
 import ManageLabels from "../screens/ManageLabels";
+import LabelsScreen from "../screens/LabelsScreen";
 const Stack = createNativeStackNavigator();
 function CreateStack() {
   return (
@@ -35,12 +36,15 @@ export default function AppNavigation() {
   const Drawer = createDrawerNavigator();
   return (
     <NavigationContainer>
-      <Drawer.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Drawer.Screen name="Home" component={CreateStack} />
+      <Drawer.Navigator>
+        <Drawer.Screen
+          name="Home"
+          component={CreateStack}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Drawer.Screen name="Labels" component={LabelsScreen} />
       </Drawer.Navigator>
     </NavigationContainer>
   );

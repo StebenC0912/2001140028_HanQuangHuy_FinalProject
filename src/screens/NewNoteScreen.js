@@ -13,7 +13,7 @@ const NewNoteScreen = ({ navigation }) => {
       return;
     }
     context.addNote({
-      colors: null, // Change this to whatever default color you want
+      colors: null,
       labels: [],
       content: content,
       updatedAt: new Date().toString(),

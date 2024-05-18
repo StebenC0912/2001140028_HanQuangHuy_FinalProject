@@ -2,6 +2,7 @@ import { useContext, useReducer } from "react";
 import React from "react";
 import { NOTES, TRASH, COLORS, LABELS } from "../dummy-data";
 import { add } from "date-fns";
+import { de } from "date-fns/locale";
 
 const NoteContext = React.createContext({
   notes: NOTES,
@@ -20,7 +21,9 @@ const NoteContext = React.createContext({
     isBookmarked,
   }) => {},
   trashNote: (id) => {},
-  addLabel: (label) => {},
+  addLabel: ({ label }) => {},
+  updateLabel: (id, { label }) => {},
+  deleteLabel: (id) => {},
 });
 
 function noteReducer(state, action) {
@@ -51,13 +54,13 @@ function noteReducer(state, action) {
         ),
       };
     case "DELETE_NOTE":
+      const deletedNote = state.notes.find(
+        (note) => note.id === action.payload.id
+      );
       return {
         ...state,
         notes: state.notes.filter((note) => note.id !== action.payload.id),
-        trash: [
-          ...state.trash,
-          state.notes.find((note) => note.id === action.payload.id),
-        ],
+        trash: [...state.trash, deletedNote],
       };
     case "RESTORE_NOTE":
       return {
@@ -66,15 +69,15 @@ function noteReducer(state, action) {
         notes: [...state.notes, action.payload],
       };
     case "TRASH_NOTE":
+      const trashedNote = state.notes.find(
+        (note) => note.id === action.payload.id
+      );
       return {
         ...state,
         notes: state.notes.filter((note) => note.id !== action.payload.id),
-        trash: [
-          ...state.trash,
-          state.notes.find((note) => note.id === action.payload.id),
-        ],
+        trash: [...state.trash, trashedNote],
       };
-      case "ADD_LABEL":
+    case "ADD_LABEL":
       return {
         ...state,
         labels: [
@@ -85,6 +88,21 @@ function noteReducer(state, action) {
           },
         ],
       };
+    case "UPDATE_LABEL":
+      return {
+        ...state,
+        labels: state.labels.map((label) =>
+          label.id === action.payload.id
+            ? { ...label, label: action.payload.label }
+            : label
+        ),
+      };
+    case "DELETE_LABEL":
+      return {
+        ...state,
+        labels: state.labels.filter((label) => label.id !== action.payload.id),
+      };
+
     default:
       return state;
   }
@@ -132,6 +150,26 @@ function NoteProvider({ children }) {
       payload: { id },
     });
   }
+  function addLabel({ label }) {
+    dispatch({
+      type: "ADD_LABEL",
+      payload: { label },
+    });
+  }
+
+  function updateLabel(id, { label }) {
+    dispatch({
+      type: "UPDATE_LABEL",
+      payload: { id, label },
+    });
+  }
+
+  function deleteLabel(id) {
+    dispatch({
+      type: "DELETE_LABEL",
+      payload: { id },
+    });
+  }
 
   return (
     <NoteContext.Provider
@@ -145,6 +183,9 @@ function NoteProvider({ children }) {
         deleteNote,
         restoreNote,
         trashNote,
+        addLabel,
+        updateLabel,
+        deleteLabel,
       }}
     >
       {children}
