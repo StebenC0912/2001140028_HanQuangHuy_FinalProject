@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/HomeScreen";
 import NewNoteScreen from "../screens/NewNoteScreen";
 import EditNote from "../screens/EditNoteScreen";
-
+import ManageLabels from "../screens/ManageLabels";
 const Stack = createNativeStackNavigator();
 function CreateStack() {
   return (
@@ -20,6 +20,14 @@ function CreateStack() {
       />
       <Stack.Screen name="NewNote" component={NewNoteScreen} />
       <Stack.Screen name="EditNote" component={EditNote} />
+      <Stack.Screen
+        name="ManageLabels"
+        component={ManageLabels}
+        options={{
+          title: "Manage Labels",
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 }

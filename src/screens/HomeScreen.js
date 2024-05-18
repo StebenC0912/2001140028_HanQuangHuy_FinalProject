@@ -1,26 +1,34 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useRef, useEffect } from "react";
 import {
   View,
   FlatList,
   Text,
   TouchableOpacity,
   ScrollView,
+  TextInput,
 } from "react-native";
 import { NoteContext } from "../data/store/NoteContext";
 import { formatDistanceToNow, format } from "date-fns";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
+import Label from "../components/Label";
 export default function HomeScreen({ navigation }) {
   const context = useContext(NoteContext);
-  const { notes, labels } = context;
-  // Sort notes by time (updatedAt)
-  const sortedNotes = [...notes].sort(
-    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-  );
-  const getLabelName = (id) => {
-    const label = labels.find((label) => label.id === id);
-    return label ? label.label : "";
-  };
+  const { notes } = context;
+
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchRef = useRef(null);
+  const [filteredNotes, setFilteredNotes] = useState(notes);
+
+  useEffect(() => {
+    const sortedNotes = [...notes]
+      .filter((note) =>
+        note.content.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+    setFilteredNotes(sortedNotes);
+  }, [searchQuery, notes]);
 
   const timeDisplay = (time) => {
     const updatedAt = new Date(time);
@@ -59,17 +67,41 @@ export default function HomeScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.openDrawer()}>
           <Ionicons name="menu" size={28} />
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            flex: 1,
+        {isSearching ? (
+          <TextInput
+            style={{
+              flex: 1,
+              fontSize: 20,
+              marginLeft: 10,
+              padding: 5,
+              borderBottomWidth: 1,
+              borderColor: "gray",
+            }}
+            placeholder="Search notes"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            ref={searchRef}
+          />
+        ) : (
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              flex: 1,
+            }}
+          >
+            Notes
+          </Text>
+        )}
+
+        <TouchableOpacity
+          onPress={() => {
+            setIsSearching(!isSearching);
+            // Clear search query
+            setSearchQuery("");
           }}
         >
-          Notes
-        </Text>
-        <TouchableOpacity>
-          <Ionicons name="search" size={28} />
+          <Ionicons name={isSearching ? "close" : "search"} size={28} />
         </TouchableOpacity>
       </View>
       <ScrollView>
@@ -88,7 +120,7 @@ export default function HomeScreen({ navigation }) {
               {notes.length} {notes.length === 1 ? "note" : "notes"}
             </Text>
             <FlatList
-              data={sortedNotes}
+              data={filteredNotes}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
               renderItem={({ item }) => {
@@ -135,32 +167,7 @@ export default function HomeScreen({ navigation }) {
                         />
                       )}
                     </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginBottom: 5,
-                      }}
-                    >
-                      {item.labelIds?.map((labelId) => (
-                        <View
-                          key={labelId}
-                          style={{
-                            backgroundColor: "#f0f0f0",
-                            marginRight: 5,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: "#ababab",
-                              paddingHorizontal: 5,
-                            }}
-                          >
-                            {getLabelName(labelId)}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
+                    <Label labelIds={item.labelIds} />
                     <Text>{item.content}</Text>
                   </TouchableOpacity>
                 );
