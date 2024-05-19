@@ -2,7 +2,7 @@ import { useContext, useReducer } from "react";
 import React from "react";
 import { NOTES, TRASH, COLORS, LABELS } from "../dummy-data";
 import { add } from "date-fns";
-import { de } from "date-fns/locale";
+import { de, tr } from "date-fns/locale";
 
 const NoteContext = React.createContext({
   notes: NOTES,
@@ -69,10 +69,10 @@ function noteReducer(state, action) {
       const trashedNote = state.notes.find(
         (note) => note.id === action.payload.id
       );
+      // just delete the note
       return {
         ...state,
-        notes: state.notes.filter((note) => note.id !== action.payload.id),
-        trash: [...state.trash, trashedNote],
+        trash: state.trash.filter((note) => note.id !== action.payload.id),
       };
     case "ADD_LABEL":
       return {

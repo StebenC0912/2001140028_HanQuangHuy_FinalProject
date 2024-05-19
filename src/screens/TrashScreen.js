@@ -131,13 +131,18 @@ export default function TrashScreen() {
         }}
       />
       <Dialog.Container visible={eachItemDialogVisible}>
-        <Dialog.Title>Restore Note</Dialog.Title>
         <Dialog.Description>
-          Do you want to restore this note?
+          What do you want to do with this note?
         </Dialog.Description>
         <Dialog.Button
-          label="Cancel"
-          onPress={() => setEachItemDialogVisible(false)}
+          label="Delete"
+          onPress={() => {
+            context.trashNote(selectedNote.id);
+            setEachItemDialogVisible(false);
+          }}
+          style={{
+            color: "red",
+          }}
         />
         <Dialog.Button
           label="Restore"
