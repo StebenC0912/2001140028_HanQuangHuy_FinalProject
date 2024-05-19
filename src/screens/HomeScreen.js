@@ -49,7 +49,7 @@ export default function HomeScreen({ navigation }) {
   const handleEditNote = (id) => {
     navigation.navigate("EditNote", { id });
   };
-
+  
   return (
     <View
       style={{
@@ -59,6 +59,7 @@ export default function HomeScreen({ navigation }) {
     >
       <View
         style={{
+          marginTop: 20,
           flexDirection: "row",
           alignItems: "center",
           marginBottom: 20,
@@ -88,6 +89,7 @@ export default function HomeScreen({ navigation }) {
               fontSize: 20,
               fontWeight: "bold",
               flex: 1,
+              marginLeft: 20,
             }}
           >
             Notes

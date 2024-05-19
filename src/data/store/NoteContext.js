@@ -12,18 +12,12 @@ const NoteContext = React.createContext({
   addNote: ({ colors, labels, content, updatedAt, isBookmarked }) => {},
   editNote: (id, { colors, labels, content, updatedAt, isBookmarked }) => {},
   deleteNote: (id) => {},
-  restoreNote: ({
-    id,
-    color,
-    labelIds,
-    content,
-    updatedAt,
-    isBookmarked,
-  }) => {},
+  restoreNote: (id) => {},
   trashNote: (id) => {},
   addLabel: ({ label }) => {},
   updateLabel: (id, { label }) => {},
   deleteLabel: (id) => {},
+  emptyTrash: () => {},
 });
 
 function noteReducer(state, action) {
@@ -63,10 +57,13 @@ function noteReducer(state, action) {
         trash: [...state.trash, deletedNote],
       };
     case "RESTORE_NOTE":
+      const restoredNote = state.trash.find(
+        (note) => note.id === action.payload.id
+      );
       return {
         ...state,
         trash: state.trash.filter((note) => note.id !== action.payload.id),
-        notes: [...state.notes, action.payload],
+        notes: [...state.notes, restoredNote],
       };
     case "TRASH_NOTE":
       const trashedNote = state.notes.find(
@@ -109,7 +106,11 @@ function noteReducer(state, action) {
         labels: state.labels.filter((label) => label.id !== action.payload.id),
         notes: updatedNotes,
       };
-
+    case "EMPTY_TRASH":
+      return {
+        ...state,
+        trash: [],
+      };
     default:
       return state;
   }
@@ -144,10 +145,10 @@ function NoteProvider({ children }) {
     });
   }
 
-  function restoreNote(note) {
+  function restoreNote(id) {
     dispatch({
       type: "RESTORE_NOTE",
-      payload: note,
+      payload: { id },
     });
   }
 
@@ -178,6 +179,11 @@ function NoteProvider({ children }) {
     });
   }
 
+  function emptyTrash() {
+    dispatch({
+      type: "EMPTY_TRASH",
+    });
+  }
   return (
     <NoteContext.Provider
       value={{
@@ -193,6 +199,7 @@ function NoteProvider({ children }) {
         addLabel,
         updateLabel,
         deleteLabel,
+        emptyTrash,
       }}
     >
       {children}
