@@ -31,11 +31,6 @@ const EditNote = ({ navigation, route }) => {
   const sheetRef = useRef(null);
   const snapPoints = useMemo(() => ["25%", "50%", "70%"], []);
 
-  const getLabelName = (id) => {
-    const label = labels.find((label) => label.id === id);
-    return label ? label.label : "";
-  };
-
   const timeDisplay = (time) => {
     const updatedAt = new Date(time);
     const now = new Date();
@@ -97,7 +92,14 @@ const EditNote = ({ navigation, route }) => {
           placeholder="Update the content here"
           ref={contentRef}
           value={note}
-          onChangeText={(text) => setNote(text)}
+          onChangeText={(text) => {
+            setNote(text);
+            context.editNote(data.id, {
+              ...data,
+              content: text,
+              updatedAt: new Date().toString(),
+            });
+          }}
         />
       </View>
 

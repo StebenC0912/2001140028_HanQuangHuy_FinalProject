@@ -98,9 +98,16 @@ function noteReducer(state, action) {
         ),
       };
     case "DELETE_LABEL":
+      const updatedNotes = state.notes.map((note) => ({
+        ...note,
+        labelIds: note.labelIds.filter(
+          (labelId) => labelId !== action.payload.id
+        ),
+      }));
       return {
         ...state,
         labels: state.labels.filter((label) => label.id !== action.payload.id),
+        notes: updatedNotes,
       };
 
     default:
